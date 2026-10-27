@@ -9,4 +9,5 @@
 - Detects zero-value `transferFrom` spoofs, dust (`--dust`) and fake tokens (famous symbols on non-canonical contracts, homoglyphs like `ĖTḨ`).
 - HIGH / MEDIUM / LOW scoring with reasons; terminal table, `--json`, `--markdown`; `--fail-on` for CI.
 - `check <wallet> <recipient>` pre-send verdict: DANGER (exit 2) / CAUTION / KNOWN / NEW.
+- Keyless RPC fallbacks that accept topic-only `eth_getLogs` (48 Club on BNB Chain, Tenderly gateways elsewhere), with chunk size following the cap an RPC names.
 - "Check wallet" GitHub Actions workflow to run a scan or a pre-send check from a phone, with per-chain annotations.
