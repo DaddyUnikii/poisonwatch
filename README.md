@@ -100,7 +100,8 @@ on `DANGER`. Add an `ETHERSCAN_API_KEY` repo secret for full history on every ch
 ## Safety
 
 - **Read-only.** It never asks for a private key or seed phrase and never signs or sends anything.
-- Without an API key, BNB Chain falls back to RPC and only sees the last `--days` of transfers.
+- Without an API key, chains whose Blockscout is unavailable fall back to RPC and only see the last `--days` of transfers
+  (BNB Chain has no Blockscout, so it always does). Keyless RPC on BNB Chain is slow; a free Etherscan key is much faster.
 - A clean result is not a guarantee. **Never copy a recipient from your transaction history**; use an address book.
 
 ## Development
