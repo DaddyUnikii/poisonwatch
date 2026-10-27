@@ -1,0 +1,47 @@
+name: Check wallet
+# Run from the Actions tab (works from your phone). Leave "recipient" empty to scan the wallet for
+# poison addresses, or fill it in to ask "is it safe to send here?" before you paste it into a wallet.
+on:
+  workflow_dispatch:
+    inputs:
+      address:
+        description: Your wallet address
+        required: true
+      recipient:
+        description: "Optional: the address you are about to send to"
+        required: false
+        default: ""
+      chains:
+        description: "Chains, comma separated (auto, eth, bsc, base, arb, op, polygon or all)"
+        default: auto
+      days:
+        description: Days of history when only RPC is available
+        default: "3"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run poisonwatch
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          ADDRESS: ${{ inputs.address }}
+          RECIPIENT: ${{ inputs.recipient }}
+          CHAINS: ${{ inputs.chains }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          set +e
+          if [ -n "$RECIPIENT" ]; then
+            node bin/poisonwatch.js check "$ADDRESS" "$RECIPIENT" -c "$CHAINS" -d "$DAYS" --markdown > report.md
+          else
+            node bin/poisonwatch.js "$ADDRESS" -c "$CHAINS" -d "$DAYS" --markdown > report.md
+          fi
+          code=$?
+          cat report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          # exit 2 = DANGER (check) so the run turns red; scans only fail on real errors
+          if [ "$code" = "2" ] && [ -z "$RECIPIENT" ]; then code=0; fi
+          exit $code

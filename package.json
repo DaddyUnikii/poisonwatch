@@ -8,7 +8,7 @@
   },
   "main": "src/detect.js",
   "scripts": {
-    "test": "node --test test/detect.test.js"
+    "test": "node --test test/detect.test.js test/check.test.js"
   },
   "engines": {
     "node": ">=18"
