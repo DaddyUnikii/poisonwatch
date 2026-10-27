@@ -21,7 +21,8 @@ export function makeRpc(urls, { fetchImpl = globalThis.fetch, retries = 2, timeo
           let body;
           try { body = JSON.parse(text); } catch { throw new Error(`HTTP ${res.status} from ${urls[i]}`); }
           if (body.error) {
-            const e = new Error(body.error.message || 'rpc error');
+            const { message = 'rpc error', data } = body.error;
+            const e = new Error(typeof data === 'string' && data ? `${message}: ${data}` : message); // some RPCs put the reason in `data`
             e.rpc = true;
             if (method === 'eth_getLogs' && !/rate|request limit/i.test(e.message) && /range|blocks|results|too large|too many|exceed/i.test(e.message)) e.range = true;
             throw e;
