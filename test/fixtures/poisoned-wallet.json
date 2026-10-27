@@ -1,0 +1,26 @@
+{
+  "_about": "A BSC wallet hit by three classic address-poisoning tricks. Values are strings (wei).",
+  "wallet": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e",
+  "txs": [
+    { "hash": "0xa1", "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x55d398326f99059ff775485246999027b3197955", "value": "0", "time": 1760000000 },
+    { "hash": "0xa2", "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x55d398326f99059ff775485246999027b3197955", "value": "0", "time": 1760500000 },
+    { "hash": "0xa3", "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x28c6c06298d514db089934071355e5743bf21d60", "value": "250000000000000000", "time": 1760600000 },
+    { "hash": "0xa4", "from": "0x9999999999999999999999999999999999999999", "to": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "value": "1000000000000000", "time": 1760700000 }
+  ],
+  "transfers": [
+    { "_note": "real send to a friend (signed)", "hash": "0xa1", "time": 1760000000, "token": "0x55d398326f99059ff775485246999027b3197955", "symbol": "USDT", "decimals": 18,
+      "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x6ff94bf88e94c6f73024d6336db8ac428025a434", "value": "120000000000000000000" },
+    { "_note": "second real send to the same friend", "hash": "0xa2", "time": 1760500000, "token": "0x55d398326f99059ff775485246999027b3197955", "symbol": "USDT", "decimals": 18,
+      "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x6ff94bf88e94c6f73024d6336db8ac428025a434", "value": "80000000000000000000" },
+    { "_note": "zero-value transferFrom spoof: attacker moved 0 USDT 'from you' to a lookalike", "hash": "0xb1", "time": 1760500100, "token": "0x55d398326f99059ff775485246999027b3197955", "symbol": "USDT", "decimals": 18,
+      "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x6ff9e6e3e3e3d1839447575eeda9f0db114ba434", "value": "0" },
+    { "_note": "fake USDT contract emits Transfer(you -> lookalike) with the same amount", "hash": "0xb2", "time": 1760500200, "token": "0xfa4e000000000000000000000000000000000bad", "symbol": "USDT", "decimals": 18,
+      "from": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "to": "0x6ff9c31e780b34c4690d4514c6e41608d70ba434", "value": "80000000000000000000" },
+    { "_note": "dust from a lookalike of the exchange deposit address", "hash": "0xb3", "time": 1760600500, "token": "0x55d398326f99059ff775485246999027b3197955", "symbol": "USDT", "decimals": 18,
+      "from": "0x28c6a1b2c3d4e5f60718293a4b5c6d7e8f901d60", "to": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "value": "1000000000000" },
+    { "_note": "fake-token spam from an address that mimics nobody", "hash": "0xb4", "time": 1760650000, "token": "0xfa4e000000000000000000000000000000000bad", "symbol": "ŪSDT", "decimals": 18,
+      "from": "0x1234567890abcdef1234567890abcdef12345678", "to": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "value": "5000000000000000000" },
+    { "_note": "an ordinary incoming payment", "hash": "0xc1", "time": 1760700000, "token": "0x55d398326f99059ff775485246999027b3197955", "symbol": "USDT", "decimals": 18,
+      "from": "0xabcabcabcabcabcabcabcabcabcabcabcabcabca", "to": "0x5f37b2286c06cd6956ee9558d0ee3ec79f3f2b9e", "value": "50000000000000000000" }
+  ]
+}
