@@ -1,0 +1,43 @@
+{
+  "name": "poisonwatch",
+  "version": "0.1.0",
+  "description": "Zero-dependency CLI that catches address-poisoning attacks on EVM wallets: lookalike addresses, zero-value transferFrom spoofs, dust and fake-token transfers.",
+  "type": "module",
+  "bin": {
+    "poisonwatch": "bin/poisonwatch.js"
+  },
+  "main": "src/detect.js",
+  "scripts": {
+    "test": "node --test test/detect.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "evm",
+    "address-poisoning",
+    "lookalike",
+    "scam",
+    "security",
+    "wallet",
+    "ethereum",
+    "bsc",
+    "base",
+    "cli",
+    "web3"
+  ],
+  "author": "Unikii (https://github.com/DaddyUnikii)",
+  "license": "MIT",
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaddyUnikii/poisonwatch.git"
+  },
+  "homepage": "https://github.com/DaddyUnikii/poisonwatch#readme"
+}
