@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { sharedEnds, isLookalike, diffMarker, isFakeToken, isDust, normSymbol, realCounterparties, classify, analyze, levelFor, failsGate, worstLevel } from '../src/detect.js';
 import { resolveChain } from '../src/chains.js';
-import { normalizeTokenTx, normalizeTx, explorerHistory, rpcHistory, TOPIC_TRANSFER } from '../src/sources.js';
+import { normalizeTokenTx, normalizeTx, explorerHistory, rpcHistory, nextStep, TOPIC_TRANSFER } from '../src/sources.js';
 import { renderReport, toJSON, toMarkdown, age } from '../src/format.js';
 import { formatUnits, isAddress, decodeString, pad32 } from '../src/hex.js';
 
@@ -229,4 +229,11 @@ test('helpers', () => {
   assert.equal(isAddress(FRIEND), true);
   assert.equal(isAddress('0x123'), false);
   assert.equal(decodeString('0x' + Buffer.from('MKR').toString('hex').padEnd(64, '0')), 'MKR');
+});
+
+test('nextStep follows the block cap an RPC names, else halves', () => {
+  assert.equal(nextStep(5000, 'Block range too large for public access: maximum 1000 blocks'), 1000);
+  assert.equal(nextStep(5000, 'exceed maximum block range: 5000'), 2500);
+  assert.equal(nextStep(5000, 'query returned more than 10000 results'), 2500);
+  assert.equal(nextStep(80, 'too large'), 50);
 });
