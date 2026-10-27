@@ -8,6 +8,9 @@ import { checkRecipient } from '../src/check.js';
 import { diffMarker } from '../src/detect.js';
 import { isAddress } from '../src/hex.js';
 import { renderReport, toJSON, toMarkdown } from '../src/format.js';
+import { readFileSync } from 'node:fs';
+
+const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 
 const HELP = `poisonwatch — catch address-poisoning attacks against your EVM wallet.
 
@@ -27,6 +30,7 @@ Options
       --fail-on <lvl>  exit 2 if any finding is at/above high|medium|low (for CI)
       --json           machine-readable output
       --markdown       markdown table (great for GitHub job summaries)
+  -v, --version        print the version
   -h, --help           show this help
 
 Exit codes: 0 ok · 1 error · 2 --fail-on tripped, or check says DANGER.
@@ -40,6 +44,7 @@ function parse(argv) {
     const a = argv[i];
     const next = () => { if (i + 1 >= argv.length) throw new Error(`${a} needs a value`); return argv[++i]; };
     if (a === '-h' || a === '--help') o.help = true;
+    else if (a === '-v' || a === '--version') o.version = true;
     else if (a === '-c' || a === '--chain') o.chain = next();
     else if (a === '-d' || a === '--days') o.days = Number(next());
     else if (a === '-n' || a === '--limit') o.limit = Number(next());
@@ -95,6 +100,7 @@ function renderCheck(res, chain) {
 async function main() {
   let o;
   try { o = parse(process.argv.slice(2)); } catch (e) { die(e.message); }
+  if (o.version) { console.log(VERSION); process.exit(0); }
   if (o.help || !o.address) { console.log(HELP); process.exit(o.help ? 0 : 1); }
   if (!isAddress(o.address)) die('not an EVM address: ' + o.address);
   if (o.cmd === 'check' && !isAddress(o.recipient || '')) die('check needs a recipient address: poisonwatch check <wallet> <recipient>');
