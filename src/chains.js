@@ -1,9 +1,10 @@
-// Chain registry. Every RPC here is a free public endpoint; pass --rpc to use your own.
+// Chain registry. Every RPC here is a free public endpoint that answers topic-only eth_getLogs
+// (most public RPCs refuse or rate-limit those); pass --rpc to use your own.
 // `tokens` lists the canonical contracts of the tokens poisoners love to fake. A token whose
 // symbol matches one of these but whose contract does not is treated as a fake.
 export const CHAINS = {
   eth: { id: 1, name: 'Ethereum', native: 'ETH', blockTime: 12,
-    rpc: ['https://ethereum-rpc.publicnode.com', 'https://eth.llamarpc.com', 'https://cloudflare-eth.com'],
+    rpc: ['https://ethereum-rpc.publicnode.com', 'https://mainnet.gateway.tenderly.co', 'https://eth.llamarpc.com', 'https://cloudflare-eth.com'],
     blockscout: 'https://eth.blockscout.com/api',
     explorer: 'https://etherscan.io',
     tokens: {
@@ -13,7 +14,7 @@ export const CHAINS = {
       DAI: ['0x6b175474e89094c44da98b954eedeac495271d0f'],
     } },
   bsc: { id: 56, name: 'BNB Chain', native: 'BNB', blockTime: 0.75,
-    rpc: ['https://bsc-rpc.publicnode.com', 'https://bsc.rpc.blxrbdn.com', 'https://bsc-dataseed.bnbchain.org', 'https://bsc.drpc.org'],
+    rpc: ['https://rpc-bsc.48.club', 'https://bsc-rpc.publicnode.com', 'https://bsc.drpc.org', 'https://bsc.rpc.blxrbdn.com'],
     explorer: 'https://bscscan.com',
     tokens: {
       USDT: ['0x55d398326f99059ff775485246999027b3197955'],
@@ -23,7 +24,7 @@ export const CHAINS = {
       ETH: ['0x2170ed0880ac9a755fd29b2688956bd959f933f8'],
     } },
   base: { id: 8453, name: 'Base', native: 'ETH', blockTime: 2,
-    rpc: ['https://base-rpc.publicnode.com', 'https://mainnet.base.org'],
+    rpc: ['https://base.gateway.tenderly.co', 'https://base-rpc.publicnode.com', 'https://mainnet.base.org'],
     blockscout: 'https://base.blockscout.com/api',
     explorer: 'https://basescan.org',
     tokens: {
@@ -33,7 +34,7 @@ export const CHAINS = {
       WETH: ['0x4200000000000000000000000000000000000006'],
     } },
   arb: { id: 42161, name: 'Arbitrum', native: 'ETH', blockTime: 0.25,
-    rpc: ['https://arbitrum-one-rpc.publicnode.com', 'https://arb1.arbitrum.io/rpc'],
+    rpc: ['https://arbitrum.gateway.tenderly.co', 'https://arbitrum-one-rpc.publicnode.com', 'https://arb1.arbitrum.io/rpc'],
     blockscout: 'https://arbitrum.blockscout.com/api',
     explorer: 'https://arbiscan.io',
     tokens: {
@@ -42,7 +43,7 @@ export const CHAINS = {
       WETH: ['0x82af49447d8a07e3bd95bd0d56f35241523fbab1'],
     } },
   op: { id: 10, name: 'Optimism', native: 'ETH', blockTime: 2,
-    rpc: ['https://optimism-rpc.publicnode.com', 'https://mainnet.optimism.io'],
+    rpc: ['https://optimism.gateway.tenderly.co', 'https://optimism-rpc.publicnode.com', 'https://mainnet.optimism.io'],
     blockscout: 'https://explorer.optimism.io/api',
     explorer: 'https://optimistic.etherscan.io',
     tokens: {
@@ -51,7 +52,7 @@ export const CHAINS = {
       WETH: ['0x4200000000000000000000000000000000000006'],
     } },
   polygon: { id: 137, name: 'Polygon', native: 'POL', blockTime: 2,
-    rpc: ['https://polygon-bor-rpc.publicnode.com', 'https://polygon-rpc.com'],
+    rpc: ['https://polygon.gateway.tenderly.co', 'https://polygon-bor-rpc.publicnode.com', 'https://polygon-rpc.com'],
     blockscout: 'https://polygon.blockscout.com/api',
     explorer: 'https://polygonscan.com',
     tokens: {

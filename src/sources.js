@@ -71,7 +71,8 @@ export async function rpcHistory({ chain, wallet, rpc, days = 3, onProgress = ()
       from = to + 1;
       onProgress((from - start) / (latest - start + 1));
     } catch (e) {
-      if (e.range && step > 250) { step = Math.floor(step / 2); continue; } // public RPCs cap ranges differently; shrink and retry
+      // public RPCs cap ranges differently: jump to the cap they name, else halve and retry
+      if (e.range && step > 50) { step = nextStep(step, e.message); continue; }
       throw e;
     }
   }
@@ -93,6 +94,13 @@ export async function rpcHistory({ chain, wallet, rpc, days = 3, onProgress = ()
   }
   await enrich({ transfers, wallet, rpc, maxLookups });
   return { transfers, txs: null, capped: false };
+}
+
+/** Smaller chunk after a range error: the limit the RPC names ("maximum 1000 blocks"), else half. */
+export function nextStep(step, message = '') {
+  const m = String(message).match(/(?:maximum|max|up to|limit)[^0-9]{0,40}(\d{2,7})/i);
+  const named = m ? Number(m[1]) : 0;
+  return named > 0 && named < step ? named : Math.max(50, Math.floor(step / 2));
 }
 
 const pool = async (items, n, fn) => {
