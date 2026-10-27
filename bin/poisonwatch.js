@@ -116,11 +116,13 @@ async function main() {
         reports.push({ chain: chain.key, source: r.source, ...res });
         if (res.verdict === 'DANGER') tripped = true;
         if (o.md) console.log(`### ${chain.key}\n\n\`\`\`\n${renderCheck(res, chain.key)}\n\`\`\`\n`);
+        if (o.md) console.error(`${chain.key}: ${res.verdict} for ${res.recipient} (source: ${r.source})`);
         else if (!o.json) console.log(renderCheck(res, chain.key) + '\n');
       } else {
         reports.push(r);
         if (failsGate(r.findings, o.failOn)) tripped = true;
         if (o.md) console.log(toMarkdown(r) + '\n');
+        if (o.md) console.error(`${chain.key}: ${r.counts.HIGH} high · ${r.counts.MEDIUM} medium · ${r.counts.LOW} low (source: ${r.source}, ${r.transfersRead} transfers)`);
         else if (!o.json) console.log(renderReport(r) + '\n');
       }
     } catch (e) {

@@ -17,12 +17,14 @@ on:
       days:
         description: Days of history when only RPC is available
         default: "3"
+permissions:
+  contents: read
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Run poisonwatch
@@ -35,13 +37,22 @@ jobs:
         run: |
           set +e
           if [ -n "$RECIPIENT" ]; then
-            node bin/poisonwatch.js check "$ADDRESS" "$RECIPIENT" -c "$CHAINS" -d "$DAYS" --markdown > report.md
+            node bin/poisonwatch.js check "$ADDRESS" "$RECIPIENT" -c "$CHAINS" -d "$DAYS" --markdown > report.md 2> status.txt
           else
-            node bin/poisonwatch.js "$ADDRESS" -c "$CHAINS" -d "$DAYS" --markdown > report.md
+            node bin/poisonwatch.js "$ADDRESS" -c "$CHAINS" -d "$DAYS" --markdown > report.md 2> status.txt
           fi
           code=$?
           cat report.md
           cat report.md >> "$GITHUB_STEP_SUMMARY"
+          # one annotation per chain, visible on the run page without opening the logs
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            case "$line" in
+              *failed*) echo "::warning title=poisonwatch::$line" ;;
+              *DANGER*) echo "::error title=poisonwatch::$line" ;;
+              *) echo "::notice title=poisonwatch::$line" ;;
+            esac
+          done < status.txt
           # exit 2 = DANGER (check) so the run turns red; scans only fail on real errors
           if [ "$code" = "2" ] && [ -z "$RECIPIENT" ]; then code=0; fi
           exit $code
