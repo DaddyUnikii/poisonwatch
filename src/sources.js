@@ -13,8 +13,8 @@ async function getJSON(url, fetchImpl, label) {
   for (let attempt = 0; ; attempt++) {
     res = await fetchImpl(url);
     text = await res.text();
-    if ((res.status !== 429 && !/rate limit|too many/i.test(text)) || attempt >= 3) break;
-    await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+    if ((res.status !== 429 && !/rate limit|too many/i.test(text)) || attempt >= 4) break;
+    await new Promise((r) => setTimeout(r, 2000 * (attempt + 1))); // keyless explorers rate-limit per IP
   }
   let body;
   try { body = JSON.parse(text); } catch { throw new Error(`${label} returned non-JSON (HTTP ${res.status})`); }
