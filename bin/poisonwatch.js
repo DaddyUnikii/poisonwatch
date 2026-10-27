@@ -4,6 +4,8 @@ import { makeRpc } from '../src/rpc.js';
 import { watch } from '../src/watch.js';
 import { activeChains } from '../src/sources.js';
 import { failsGate } from '../src/detect.js';
+import { checkRecipient } from '../src/check.js';
+import { diffMarker } from '../src/detect.js';
 import { isAddress } from '../src/hex.js';
 import { renderReport, toJSON, toMarkdown } from '../src/format.js';
 
@@ -11,6 +13,7 @@ const HELP = `poisonwatch — catch address-poisoning attacks against your EVM w
 
 Usage
   poisonwatch <wallet> [options]               scan history for poison lookalike addresses
+  poisonwatch check <wallet> <recipient>       before sending: is this recipient a lookalike?
 
 Options
   -c, --chain <list>   chains, comma separated (default: auto = every chain the wallet has used)
@@ -26,7 +29,7 @@ Options
       --markdown       markdown table (great for GitHub job summaries)
   -h, --help           show this help
 
-Exit codes: 0 ok · 1 error · 2 --fail-on tripped.
+Exit codes: 0 ok · 1 error · 2 --fail-on tripped, or check says DANGER.
 Read-only: poisonwatch never asks for a key and never signs anything.
 Set ETHERSCAN_API_KEY for full history on every chain (free key, etherscan.io).`;
 
@@ -50,8 +53,8 @@ function parse(argv) {
     else if (a.startsWith('-')) throw new Error(`unknown option ${a}`);
     else pos.push(a);
   }
-  o.cmd = 'scan';
-  o.address = pos[0];
+  if (pos[0] === 'check') { o.cmd = 'check'; o.address = pos[1]; o.recipient = pos[2]; }
+  else { o.cmd = 'scan'; o.address = pos[0]; }
   return o;
 }
 
@@ -78,11 +81,23 @@ async function runChain(o, chain, wallet) {
   return r;
 }
 
+function renderCheck(res, chain) {
+  const mark = { DANGER: '⛔ DANGER', CAUTION: '⚠️  CAUTION', KNOWN: '✅ KNOWN', NEW: '🆕 NEW' }[res.verdict];
+  const lines = [`${mark} · ${chain} · ${res.recipient}`];
+  for (const t of res.lookalikeOf || []) {
+    lines.push(`   real   ${t.address}   ← you sent here ${t.sends}×`);
+    lines.push(`          ${diffMarker(res.recipient, t.address)} differs`);
+  }
+  for (const r of res.reasons) lines.push(`   ↳ ${r}`);
+  return lines.join('\n');
+}
+
 async function main() {
   let o;
   try { o = parse(process.argv.slice(2)); } catch (e) { die(e.message); }
   if (o.help || !o.address) { console.log(HELP); process.exit(o.help ? 0 : 1); }
   if (!isAddress(o.address)) die('not an EVM address: ' + o.address);
+  if (o.cmd === 'check' && !isAddress(o.recipient || '')) die('check needs a recipient address: poisonwatch check <wallet> <recipient>');
   if (!(o.days > 0) || !(o.limit > 0)) die('--days and --limit must be positive numbers');
   if (!(o.prefix >= 1 && o.prefix <= 20 && o.suffix >= 1 && o.suffix <= 20)) die('--prefix and --suffix must be between 1 and 20');
   if (o.failOn && !['HIGH', 'MEDIUM', 'LOW'].includes(o.failOn)) die('--fail-on must be high, medium or low');
@@ -96,10 +111,18 @@ async function main() {
   for (const chain of chains) {
     try {
       const r = await runChain(o, chain, wallet);
-      reports.push(r);
-      if (failsGate(r.findings, o.failOn)) tripped = true;
-      if (o.md) console.log(toMarkdown(r) + '\n');
-      else if (!o.json) console.log(renderReport(r) + '\n');
+      if (o.cmd === 'check') {
+        const res = checkRecipient({ analysis: r, recipient: o.recipient, prefix: o.prefix, suffix: o.suffix });
+        reports.push({ chain: chain.key, source: r.source, ...res });
+        if (res.verdict === 'DANGER') tripped = true;
+        if (o.md) console.log(`### ${chain.key}\n\n\`\`\`\n${renderCheck(res, chain.key)}\n\`\`\`\n`);
+        else if (!o.json) console.log(renderCheck(res, chain.key) + '\n');
+      } else {
+        reports.push(r);
+        if (failsGate(r.findings, o.failOn)) tripped = true;
+        if (o.md) console.log(toMarkdown(r) + '\n');
+        else if (!o.json) console.log(renderReport(r) + '\n');
+      }
     } catch (e) {
       reports.push({ chain: chain.key, error: e.message });
       if (!o.json) console.error(`${chain.key}: failed (${e.message}). Try --rpc <your url> or a smaller --days.\n`);
